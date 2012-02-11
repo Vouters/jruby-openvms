@@ -1,6 +1,6 @@
 diff -Naur b/jruby-1.6.6/src/org/jruby/RubyDir.java jruby-1.6.6/src/org/jruby/RubyDir.java
 --- b/jruby-1.6.6/src/org/jruby/RubyDir.java	2012-01-30 17:57:23.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/RubyDir.java	2012-02-10 15:24:31.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/RubyDir.java	2012-02-11 12:58:32.000000000 +0100
 @@ -59,6 +59,7 @@
  import org.jruby.util.Dir;
  import org.jruby.util.JRubyFile;
@@ -43,7 +43,7 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/RubyDir.java jruby-1.6.6/src/org/jruby/Ru
          String realPath = null;
 diff -Naur b/jruby-1.6.6/src/org/jruby/RubyFile.java jruby-1.6.6/src/org/jruby/RubyFile.java
 --- b/jruby-1.6.6/src/org/jruby/RubyFile.java	2012-01-30 17:57:23.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/RubyFile.java	2012-02-10 15:24:31.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/RubyFile.java	2012-02-11 12:58:32.000000000 +0100
 @@ -76,6 +76,7 @@
  import org.jruby.util.io.ModeFlags;
  import org.jruby.util.JRubyFile;
@@ -148,12 +148,11 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/RubyFile.java jruby-1.6.6/src/org/jruby/R
      }
 diff -Naur b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java jruby-1.6.6/src/org/jruby/util/GetUnixPath.java
 --- b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	1970-01-01 01:00:00.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	2012-02-10 15:24:31.000000000 +0100
-@@ -0,0 +1,19 @@
++++ jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	2012-02-11 12:59:19.000000000 +0100
+@@ -0,0 +1,15 @@
 +package org.jruby.util;
 +
 +import org.jruby.util.OpenvmsFilespecTranslate;
-+import org.jruby.util.WindowsFilespecTranslate;
 +
 +public class GetUnixPath {
 +    public static String getUnixPath (String filename) {
@@ -162,16 +161,13 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java jruby-1.6.6/src/org
 +        path = OpenvmsFilespecTranslate.vmsFilespecToUnix(filename);
 +        if (path != null)
 +            return path;
-+        path = WindowsFilespecTranslate.windowsFilespecToUnix(filename);
-+        if ( path != null)
-+            return path;
 +        else
 +            return filename;
 +    }
 +}
 diff -Naur b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java jruby-1.6.6/src/org/jruby/util/JRubyFile.java
 --- b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-01-30 17:57:24.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-02-10 15:24:31.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-02-11 12:58:32.000000000 +0100
 @@ -39,6 +39,7 @@
  
  import org.jruby.ext.posix.JavaSecuredFile;
@@ -192,7 +188,7 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java jruby-1.6.6/src/org/j
      public static String normalizeSeps(String path) {
 diff -Naur b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java
 --- b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	1970-01-01 01:00:00.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	2012-02-10 22:14:15.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	2012-02-11 12:58:32.000000000 +0100
 @@ -0,0 +1,507 @@
 +//
 +// File : \B*DeccTranslateName.java*\B
@@ -701,60 +697,3 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java jruby-
 +       return vmstoUnixFilespec;
 +   }
 +}
-diff -Naur b/jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java
---- b/jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java	1970-01-01 01:00:00.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java	2012-02-10 15:24:31.000000000 +0100
-@@ -0,0 +1,53 @@
-+//
-+// File : \B*WindowsFilespecTranslate.java*\B
-+//
-+//        Copyright (C) 2011 by Philippe.Vouters@laposte.net
-+//
-+//    This program is free software: you can redistribute it and/or modify
-+//    it under the terms of the GNU General Public License as published by the
-+//    Free Software Foundation, either version 3 of the License, or
-+//    any later version.
-+//
-+//    This program is distributed in the hope that it will be useful,
-+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+//    GNU General Public License for more details.
-+//
-+//    You should have received a copy of the GNU General Public License
-+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+//
-+package org.jruby.util;
-+
-+import java.util.regex.Pattern;
-+import java.util.regex.Matcher;
-+import java.io.IOException;
-+import java.lang.IndexOutOfBoundsException;
-+
-+public class WindowsFilespecTranslate {
-+   public static String windowsFilespecToUnix (String windowsFilespec){
-+        String drivename = "^([A-Za-z]:)?";
-+        String windowsPath = "(\\\\?[^/\\:\\t\\r\\n]+)+";
-+        String UnixFilespec = null;
-+
-+        Pattern regex =
-+              Pattern.compile(drivename +
-+                              windowsPath);
-+        Matcher fit=regex.matcher(windowsFilespec);
-+        if (!fit.matches()){
-+            return null;
-+        }
-+        int MAX_MATCH=6;
-+
-+        boolean debug = Boolean.valueOf(System.getProperty("debug","false"));
-+        if (debug) {
-+            try {
-+                for (int i=0; i<MAX_MATCH;i++)
-+                   System.out.println("fit.group("+i+") = "+fit.group(i));
-+            } catch (IndexOutOfBoundsException e) {
-+              // do nothing
-+            }
-+        }
-+        UnixFilespec = new String(fit.group(0).replace('\\','/'));
-+        return UnixFilespec;
-+   }
-+}  
