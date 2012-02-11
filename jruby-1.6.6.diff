@@ -1,0 +1,760 @@
+diff -Naur b/jruby-1.6.6/src/org/jruby/RubyDir.java jruby-1.6.6/src/org/jruby/RubyDir.java
+--- b/jruby-1.6.6/src/org/jruby/RubyDir.java	2012-01-30 17:57:23.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/RubyDir.java	2012-02-10 15:24:31.000000000 +0100
+@@ -59,6 +59,7 @@
+ import org.jruby.util.Dir;
+ import org.jruby.util.JRubyFile;
+ import org.jruby.util.ByteList;
++import org.jruby.util.GetUnixPath;
+ import static org.jruby.CompatVersion.*;
+ 
+ /**
+@@ -133,7 +134,9 @@
+ 
+         getRuntime().checkSafeString(newPath);
+ 
+-        String adjustedPath = RubyFile.adjustRootPathOnWindows(getRuntime(), newPath.toString(), null);
++        String adjustedPath = RubyFile.adjustRootPathOnWindows(getRuntime(),
++                                 GetUnixPath.getUnixPath(newPath.toString()),
++                                 null);
+         checkDirIsTwoSlashesOnWindows(getRuntime(), adjustedPath);
+ 
+         dir = JRubyFile.create(getRuntime().getCurrentDirectory(), adjustedPath);
+@@ -374,7 +377,8 @@
+     }
+ 
+     private static RubyArray entriesCommon(Ruby runtime, String path) {
+-        String adjustedPath = RubyFile.adjustRootPathOnWindows(runtime, path, null);
++        String adjustedPath = RubyFile.adjustRootPathOnWindows(runtime, 
++                                        GetUnixPath.getUnixPath(path), null);
+         checkDirIsTwoSlashesOnWindows(runtime, adjustedPath);
+ 
+         Object[] files = getEntries(runtime, adjustedPath).toArray();
+@@ -443,7 +447,9 @@
+         Ruby runtime = context.getRuntime();
+         RubyString path = args.length == 1 ?
+             RubyFile.get_path(context, args[0]) : getHomeDirectoryPath(context);
+-        String adjustedPath = RubyFile.adjustRootPathOnWindows(runtime, path.getUnicodeValue(), null);
++        String adjustedPath = RubyFile.adjustRootPathOnWindows(runtime, 
++                                GetUnixPath.getUnixPath(path.getUnicodeValue()),
++                                null); 
+         checkDirIsTwoSlashesOnWindows(runtime, adjustedPath);
+         JRubyFile dir = getDir(runtime, adjustedPath, true);
+         String realPath = null;
+diff -Naur b/jruby-1.6.6/src/org/jruby/RubyFile.java jruby-1.6.6/src/org/jruby/RubyFile.java
+--- b/jruby-1.6.6/src/org/jruby/RubyFile.java	2012-01-30 17:57:23.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/RubyFile.java	2012-02-10 15:24:31.000000000 +0100
+@@ -76,6 +76,7 @@
+ import org.jruby.util.io.ModeFlags;
+ import org.jruby.util.JRubyFile;
+ import org.jruby.util.TypeConverter;
++import org.jruby.util.GetUnixPath;
+ import org.jruby.util.io.BadDescriptorException;
+ import org.jruby.util.io.FileExistsException;
+ import org.jruby.util.io.InvalidValueException;
+@@ -121,15 +122,16 @@
+ 
+     private static boolean startsWithDriveLetterOnWindows(String path) {
+         return (path != null)
+-            && Platform.IS_WINDOWS && 
+-            ((path.length()>1 && path.charAt(0) == '/') ? 
++            && Platform.IS_WINDOWS &&
++            ((path.length()>1 && path.charAt(0) == '/') ?
+              (path.length() > 2
+               && isWindowsDriveLetter(path.charAt(1))
+-              && path.charAt(2) == ':') : 
++              && path.charAt(2) == ':') :
+              (path.length() > 1
+               && isWindowsDriveLetter(path.charAt(0))
+               && path.charAt(1) == ':'));
+     }
++
+     // adjusts paths started with '/' or '\\', on windows.
+     static String adjustRootPathOnWindows(Ruby runtime, String path, String dir) {
+         if (path == null || !Platform.IS_WINDOWS) return path;
+@@ -470,8 +472,9 @@
+         RubyString filename = get_path(context, args[0]);
+         runtime.checkSafeString(filename);
+ 
+-        path = adjustRootPathOnWindows(runtime, filename.getUnicodeValue(), runtime.getCurrentDirectory());
+-
++        path = adjustRootPathOnWindows(runtime, 
++                         GetUnixPath.getUnixPath(filename.getUnicodeValue()),
++                         runtime.getCurrentDirectory());
+         String modeString = "r";
+         ModeFlags modes = new ModeFlags();
+         RubyHash options = null;
+@@ -519,8 +522,10 @@
+         RubyString filename = get_path(runtime.getCurrentContext(), args[0]);
+         runtime.checkSafeString(filename);
+         
+-        path = adjustRootPathOnWindows(runtime, filename.getUnicodeValue(), runtime.getCurrentDirectory());
+-        
++        path = adjustRootPathOnWindows(runtime,
++                          GetUnixPath.getUnixPath(filename.getUnicodeValue()),
++                          runtime.getCurrentDirectory());
++
+         String modeString;
+         ModeFlags modes;
+         int perm;
+@@ -1014,9 +1019,9 @@
+     @JRubyMethod(required = 1, meta = true)
+     public static IRubyObject dirname(ThreadContext context, IRubyObject recv, IRubyObject arg) {
+         RubyString filename = get_path(context, arg);
+-        
+-        String jfilename = filename.getUnicodeValue();
+-        
++
++        String jfilename  = GetUnixPath.getUnixPath(filename.getUnicodeValue());
++
+         String name = jfilename.replace('\\', '/');
+         int minPathLength = 1;
+         boolean trimmedSlashes = false;
+@@ -1184,7 +1189,7 @@
+         // If there's a second argument, it's the path to which the first
+         // argument is relative.
+         if (args.length == 2 && !args[1].isNil()) {
+-            cwd = get_path(context, args[1]).getUnicodeValue();
++            cwd = GetUnixPath.getUnixPath(get_path(context, args[1]).getUnicodeValue());
+ 
+             // Handle ~user paths.
+             if (expandUser) {
+@@ -1200,7 +1205,7 @@
+             cwd = adjustRootPathOnWindows(runtime, cwd, null);
+ 
+             boolean startsWithSlashNotOnWindows = (cwd != null)
+-                    && !Platform.IS_WINDOWS && cwd.length() > 0
++                    && !Platform.IS_WINDOWS && cwd.length() > 0 
+                     && cwd.charAt(0) == '/';
+ 
+             // TODO: better detection when path is absolute or not.
+@@ -1265,7 +1270,7 @@
+             relativePath = adjustRootPathOnWindows(runtime, relativePath, cwd);
+             path = JRubyFile.create(cwd, relativePath);
+         }
+-
++        
+         return runtime.newString(padSlashes + canonicalize(path.getAbsolutePath()));
+     }
+ 
+@@ -1655,7 +1660,7 @@
+     @JRubyMethod(required = 1, meta = true)
+     public static RubyArray split(ThreadContext context, IRubyObject recv, IRubyObject arg) {
+         RubyString filename = get_path(context, arg);
+-        
++
+         return context.getRuntime().newArray(dirname(context, recv, filename),
+                 basename(context, recv, new IRubyObject[] { filename }));
+     }
+diff -Naur b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java jruby-1.6.6/src/org/jruby/util/GetUnixPath.java
+--- b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	1970-01-01 01:00:00.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	2012-02-10 15:24:31.000000000 +0100
+@@ -0,0 +1,19 @@
++package org.jruby.util;
++
++import org.jruby.util.OpenvmsFilespecTranslate;
++import org.jruby.util.WindowsFilespecTranslate;
++
++public class GetUnixPath {
++    public static String getUnixPath (String filename) {
++        String path;
++
++        path = OpenvmsFilespecTranslate.vmsFilespecToUnix(filename);
++        if (path != null)
++            return path;
++        path = WindowsFilespecTranslate.windowsFilespecToUnix(filename);
++        if ( path != null)
++            return path;
++        else
++            return filename;
++    }
++}
+diff -Naur b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java jruby-1.6.6/src/org/jruby/util/JRubyFile.java
+--- b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-01-30 17:57:24.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-02-10 15:24:31.000000000 +0100
+@@ -39,6 +39,7 @@
+ 
+ import org.jruby.ext.posix.JavaSecuredFile;
+ import org.jruby.platform.Platform;
++import org.jruby.util.GetUnixPath;
+ 
+ /**
+  * <p>This file acts as an alternative to NormalizedFile, due to the problems with current working 
+@@ -49,7 +50,8 @@
+     private static final long serialVersionUID = 435364547567567L;
+ 
+     public static JRubyFile create(String cwd, String pathname) {
+-        return createNoUnicodeConversion(cwd, pathname);
++        return createNoUnicodeConversion(GetUnixPath.getUnixPath(cwd),
++					 GetUnixPath.getUnixPath(pathname));
+     }
+ 
+     public static String normalizeSeps(String path) {
+diff -Naur b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java
+--- b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	1970-01-01 01:00:00.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	2012-02-10 22:14:15.000000000 +0100
+@@ -0,0 +1,507 @@
++//
++// File : \B*DeccTranslateName.java*\B
++//
++//        Copyright (C) 2011 by Philippe.Vouters@laposte.net
++//
++//    This program is free software: you can redistribute it and/or modify
++//    it under the terms of the GNU General Public License as published by the
++//    Free Software Foundation, either version 3 of the License, or
++//    any later version.
++//
++//    This program is distributed in the hope that it will be useful,
++//    but WITHOUT ANY WARRANTY; without even the implied warranty of
++//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++//    GNU General Public License for more details.
++//
++//    You should have received a copy of the GNU General Public License
++//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
++//
++package org.jruby.util;
++
++import java.util.regex.Pattern;
++import java.util.regex.Matcher;
++import java.io.IOException;
++
++public class OpenvmsFilespecTranslate {
++   //
++   // For ODS-5 special characters and valid character set, refer to :
++   // http://h71000.www7.hp.com/doc/73final/6536/6536pro_002.html#ods5names_hd
++   //
++   public static String validEscapedCharacters = "+,;\\[\\]%\\:\\^& "+
++                                                 "012345789ABCDEFU._";
++   public static String invalidOds5Characters = "\"\\*\\\\<>/\\?\\|";
++
++   private static class StringAndIntRecord{
++       private String vmstoUnixFilespec;
++       private String vmsFilespec;
++       private int startStringIndex;
++
++       private static final char[] kDigits = { '0', '1', '2', '3', '4', '5',
++                                          '6', '7', '8', '9', 'A',
++                                          'B', 'C', 'D', 'E', 'F' };
++
++       private int CheckValidEscapedCharacter(){
++          //
++          // Parse the input string to check whether all circumflex characters
++          // are immediately followed by a valid escaped character.
++          // Except the dot, check whether an escaped character is not found
++          // without a preceeding circumflex character.
++          //
++          for (int i = startStringIndex; i < vmsFilespec.length(); i++){
++               if (vmsFilespec.charAt(i) == '^' && i < vmsFilespec.length()-1){
++                   int escapeCharIndex =
++                       validEscapedCharacters.indexOf(vmsFilespec.charAt(i+1));
++                   if (escapeCharIndex == -1)
++                       return -1;
++                   if (escapeCharIndex < 
++                               validEscapedCharacters.indexOf('0') ||
++                        escapeCharIndex > 
++                               validEscapedCharacters.indexOf('U')){
++                       i++;
++                       continue;                  
++                   }
++                   else if (escapeCharIndex >=
++                                      validEscapedCharacters.indexOf('0') && 
++                            escapeCharIndex < 
++                                      validEscapedCharacters.indexOf('U') &&
++                            i < vmsFilespec.length() - 2){
++                       for (int j= 0; j < 2; j++){
++                           if (vmsFilespec.charAt(i+1+j) >= 'a' &&
++                               vmsFilespec.charAt(i+1+j) <= 'f')
++                               vmsFilespec = vmsFilespec.substring(0,i+1+j) +
++                                             Character.toUpperCase(
++                                                  vmsFilespec.charAt(i+1+j)) +
++                                                  vmsFilespec.substring(i+2+j,
++                                                        vmsFilespec.length());
++                       }
++                       for (int j= 0; j < 2; j++){
++                            if (!Character.isDigit(vmsFilespec.charAt(i+1+j))&&
++                                (vmsFilespec.charAt(i+1+j) < 'A' ||
++                                 vmsFilespec.charAt(i+1+j) > 'F'))
++                            return -1;
++                       }
++                       i += 2;
++                       continue;
++                   }
++                   else if (escapeCharIndex == 
++                                  validEscapedCharacters.indexOf('U') &&
++                            i < vmsFilespec.length() - 5) {
++                       for (int j = 0; j < 4 ; j++){
++                            if (vmsFilespec.charAt(i+2+j) >= 'a' &&
++                                vmsFilespec.charAt(i+2+j) <= 'f')
++                               vmsFilespec = vmsFilespec.substring(0,i+2+j) +
++                                              Character.toUpperCase(
++                                                  vmsFilespec.charAt(i+2+j)) +
++                                              vmsFilespec.substring(i+3+j,
++                                                        vmsFilespec.length());
++                       }
++                       for (int j= 0; j < 4; j++){
++                            if (!Character.isDigit(vmsFilespec.charAt(i+2+j))&&
++                                (vmsFilespec.charAt(i+2+j) < 'A' ||
++                                 vmsFilespec.charAt(i+2+j) > 'F'))
++                            return -1;
++                       }
++                       i += 5;
++                       continue;
++                   }
++                   else
++                       return -1;
++               }
++               int escapeCharIndex =
++                       validEscapedCharacters.indexOf(vmsFilespec.charAt(i));
++               if (escapeCharIndex != -1 &&
++                   escapeCharIndex < validEscapedCharacters.indexOf('0'))
++                   return -1;
++          }
++          return 0;
++       }
++
++       //
++       // the two hexToBytes methods are copied from:
++       // http://www.java2s.com/Code/Java/Development-Class/ConverthexToBytes.htm
++       //
++       public static byte[] hexToBytes(char[] hex) {
++           int length = hex.length / 2;
++           byte[] raw = new byte[length];
++           for (int i = 0; i < length; i++) {
++                int high = Character.digit(hex[i * 2], 16);
++                int low = Character.digit(hex[i * 2 + 1], 16);
++                int value = (high << 4) | low;
++                if (value > 127)
++                    value -= 256;
++                raw[i] = (byte) value;
++           }
++           return raw;
++       }
++
++       public static byte[] hexToBytes(String hex) {
++           return hexToBytes(hex.toCharArray());
++       }
++
++       public String getVmstoUnixFilespec(){
++           return vmstoUnixFilespec;
++       }
++
++       public StringAndIntRecord(String vmsFilespec,
++                                 int startStringIndex){
++            this.startStringIndex = startStringIndex;
++            this.vmsFilespec = vmsFilespec;
++       }
++
++       public void turnAllCircumflex(boolean addSlash){
++          int posDot;
++
++          vmstoUnixFilespec = "";
++          if (vmsFilespec.length() == 0)
++              return;
++
++          if (CheckValidEscapedCharacter() == -1){
++              vmstoUnixFilespec = null;
++              return;
++          }
++          //
++          // Process all dots except if it starts the string and if not
++          // preceeded by a cicumflex character for a directory operation
++          // (addSlash == true). For a file operation (addSlash == false),
++          // treat the dot as invalid if not preceeded by a circumflex.
++          // If preceeded by a circumflex, this is processed later in this
++          // routine in the final while loop.
++          //
++          while ((posDot = vmsFilespec.indexOf('.',startStringIndex)) != -1){
++                if (startStringIndex < posDot &&
++                    vmsFilespec.charAt(posDot-1) != '^'){
++                    vmstoUnixFilespec += vmsFilespec.substring(startStringIndex,
++                                                               posDot);
++                    if (addSlash)
++                        vmstoUnixFilespec += "/";
++                    else
++                        vmstoUnixFilespec += ".";
++                }
++                else if (posDot != startStringIndex &&
++                         vmsFilespec.charAt(posDot-1) == '^')                    
++                    vmstoUnixFilespec += vmsFilespec.substring(startStringIndex,
++                                                                 posDot+1);
++                else if (posDot == startStringIndex  && !addSlash){
++                    vmstoUnixFilespec += ".";
++                }
++                startStringIndex = posDot+1;
++          }
++          //
++          // No more dots to process, add in the remaining of the input string
++          //
++          if (startStringIndex < vmsFilespec.length())
++              vmstoUnixFilespec += vmsFilespec.substring(startStringIndex,
++                                            vmsFilespec.length());
++         //
++         // Add in final slash if requested.
++         //
++         if (addSlash && vmstoUnixFilespec.length() != 0)
++              vmstoUnixFilespec += "/";
++
++         //
++         // Process VMS file specification escape characters.
++         //
++         posDot = 0;
++         while ((posDot = vmstoUnixFilespec.indexOf('^',posDot)) != -1){
++                if (validEscapedCharacters.indexOf(
++                                    vmstoUnixFilespec.charAt(posDot+1)) != -1){
++                    int escapeCharIndex =
++                        validEscapedCharacters.indexOf(vmstoUnixFilespec.charAt(posDot+1));
++                    if (escapeCharIndex <
++                                      validEscapedCharacters.indexOf('0') ||
++                        escapeCharIndex >
++                                      validEscapedCharacters.indexOf('U')){ 
++                        if (validEscapedCharacters.charAt(escapeCharIndex) ==
++                                             '_') {
++                            vmstoUnixFilespec =
++                                        vmstoUnixFilespec.substring(0,posDot) +
++                                           " " +
++                                        vmstoUnixFilespec.substring(posDot+2,
++                                                   vmstoUnixFilespec.length());
++                        }
++                        else {
++                            vmstoUnixFilespec = 
++                                        vmstoUnixFilespec.substring(0,posDot) +
++                                           vmstoUnixFilespec.charAt(posDot+1) +
++                                           vmstoUnixFilespec.substring(posDot+2,
++                                                    vmstoUnixFilespec.length());
++                       }
++                    }
++                    else if (escapeCharIndex >=
++                                      validEscapedCharacters.indexOf('0') &&
++                             escapeCharIndex <
++                                 validEscapedCharacters.indexOf('U')){
++                       byte[] hexChar = hexToBytes(
++                                       vmstoUnixFilespec.substring(posDot+1,
++                                                                  posDot+3));
++                       // Do not accept control characters in the
++                       // range 0x00 to 0x1F                         
++                       if (hexChar[0] < 32 ){
++                           vmstoUnixFilespec = null;
++                           return;
++                       }
++
++                       vmstoUnixFilespec =
++                                        vmstoUnixFilespec.substring(0,posDot) +
++                                         (char)hexChar[0] +
++                                         vmstoUnixFilespec.substring(posDot+3,
++                                                   vmstoUnixFilespec.length());
++                    }
++                    else if (escapeCharIndex ==
++                                 validEscapedCharacters.indexOf('U')){
++                          byte [] hexTwoBytes = hexToBytes(
++                                       vmstoUnixFilespec.substring(posDot+2,
++                                                                   posDot+6));
++                          // Do not accept control characters in the
++                          // range 0x00 to 0x1F
++                          if (hexTwoBytes[0] == 0 && hexTwoBytes[1] < 32 ){
++                              vmstoUnixFilespec = null;
++                              return;
++                          }
++
++                          String UnicodeChar = new String(hexTwoBytes);
++                          vmstoUnixFilespec =
++                                        vmstoUnixFilespec.substring(0,posDot) +
++                                        UnicodeChar +
++                                        vmstoUnixFilespec.substring(posDot+6,
++                                                  vmstoUnixFilespec.length());
++                   }    
++                }
++                posDot++;
++         }
++
++         //
++         // process "-/" in directory paths.
++         //
++         if (addSlash){
++            posDot = 0;
++            while ((posDot = vmstoUnixFilespec.indexOf("-/",posDot)) != -1){
++                  vmstoUnixFilespec = vmstoUnixFilespec.substring(0,posDot) +
++                                       "../" +
++                                      vmstoUnixFilespec.substring(posDot+2,
++                                                   vmstoUnixFilespec.length());
++                  posDot += 3;
++            }
++         }
++       }
++   }
++   private static boolean checkVersionNumber(String version){
++      int versionNumber = Integer.parseInt(version);
++      if (versionNumber > 32767)
++          return false;
++      return true;
++   }
++
++   public static String vmsFilespecToUnix (String vmsFilespec) {
++       String diskname = "^([^\\["+invalidOds5Characters+"\\]]+:)?";
++       String directory = "((\\[|<)" +
++                          "([^"+invalidOds5Characters+"]){0,}"+
++                          "(\\]|>))?";
++       String filename = "([^"+invalidOds5Characters+"]+)";
++       String extension = "(\\.([^"+invalidOds5Characters+"]+)?)";
++       String version = "(;(\\d+)?)?";
++
++       Pattern regex = Pattern.compile(diskname +
++				 directory +
++                                 filename + "{0,1}" +
++                                 extension +
++                                 version);
++       int MAX_MATCH = 10;
++       Matcher fit=regex.matcher(vmsFilespec);
++       if (!fit.matches()){
++           regex = Pattern.compile(diskname +
++                                   directory +
++                                   filename);
++           fit=regex.matcher(vmsFilespec);
++           if (!fit.matches())
++               return null;
++           else
++               MAX_MATCH = 7;
++       }
++       boolean debug = Boolean.valueOf(System.getProperty("debug","false"));
++       if (debug) {
++          for (int i=0; i<MAX_MATCH;i++)
++               System.out.println("fit.group("+i+") = "+fit.group(i));
++       }
++       char closingDir = 0;
++
++       if (fit.group(3) == null || fit.group(5) == null)
++           return null;
++       if (fit.group(3).compareTo("[") == 0 &&
++           fit.group(5).compareTo("]") != 0)
++           return null;
++       if (fit.group(3).compareTo("<") == 0 &&
++           fit.group(5).compareTo(">") != 0)
++           return null;
++       closingDir = fit.group(5).charAt(0);
++       if (MAX_MATCH == 10 && fit.group(7) != null &&
++           fit.group(7).matches("."))
++           return null;
++
++       String currentDir;
++       try {
++           currentDir = new java.io.File( "." ).getCanonicalPath();
++       } catch (IOException e) {
++           return null;
++       }
++       int posDot;
++       int startStringIndex = 1;
++       boolean processMatch2 = true;
++       String vmstoUnixFilespec = new String(currentDir); 
++      
++       //if (System.getProperty("os.name").toLowerCase().equals("openvms")) {
++       //    vmstoUnixFilespec = new String(currentDir);
++       //}
++       for (int i = 1; i < MAX_MATCH; i++){
++           switch (i) {
++              case 1:
++                   if (fit.group(1) != null){
++                       int posSlash = vmstoUnixFilespec.indexOf('/',1);
++                       if (posSlash == -1)
++                           posSlash = vmstoUnixFilespec.length();
++                       else
++                           posSlash++;
++                       StringAndIntRecord record = 
++                                 new StringAndIntRecord(
++                                        fit.group(1).substring(
++                                        0, fit.group(1).indexOf(':')), 0);
++                       record.turnAllCircumflex(true);
++                       String returnedString = record.getVmstoUnixFilespec();
++                       if (returnedString == null)
++                           return null;
++                       vmstoUnixFilespec = "/"+ returnedString +
++                                           vmstoUnixFilespec.substring(
++                                                 posSlash,
++                                                 vmstoUnixFilespec.length());
++                       }
++                       if (vmstoUnixFilespec.length() != 0 &&
++                           vmstoUnixFilespec.charAt(
++                               vmstoUnixFilespec.length()- 1) != '/')
++                           vmstoUnixFilespec += "/";
++                        break;
++              case 2:
++                   if (fit.group(2) != null && processMatch2 &&
++                       startStringIndex < fit.group(2).length()){
++                       StringAndIntRecord record = new StringAndIntRecord(
++                                    fit.group(2).substring(
++                                             startStringIndex,
++                                             fit.group(2).indexOf(closingDir)),
++                                    0);
++                       record.turnAllCircumflex(true);
++                       String returnedString = record.getVmstoUnixFilespec();
++                       if (returnedString == null)
++                           return null;
++                       if (fit.group(2).charAt(startStringIndex) != '.' &&
++                           fit.group(2).charAt(startStringIndex) != closingDir)
++                           vmstoUnixFilespec = "/" +
++                                               vmstoUnixFilespec.substring(1,
++                                                    vmstoUnixFilespec.indexOf('/',1)+1);
++                       vmstoUnixFilespec += returnedString;
++                   }
++                   break;
++              case 6:                      
++                   if (fit.group(6) != null){
++                       StringAndIntRecord record = new StringAndIntRecord(
++                                                        fit.group(6),
++                                                        0);
++                       record.turnAllCircumflex(false);
++                       String returnedString = record.getVmstoUnixFilespec();
++                       if (MAX_MATCH == 10 && returnedString == null &&
++                            fit.group(6).charAt(fit.group(6).length()-1) == '^' 
++                            && fit.group(7).compareTo(".") == 0){
++                           String correctedString = fit.group(6) + fit.group(7);
++                           record = new StringAndIntRecord(
++                                                        correctedString,
++                                                        0);
++                           record.turnAllCircumflex(false);
++                           returnedString = record.getVmstoUnixFilespec();
++                       }    
++                       if (returnedString == null)
++                           return null;
++                       vmstoUnixFilespec += returnedString;
++                   }
++                   break;
++              case 8:
++                   if (fit.group(8) != null) {
++                       //
++                       // Valid if filename is foo.1.2.3 in which
++                       // case .3 is taken as a version number. In this
++                       // case, fit.group(8) is "3" and fit.group(6) equals
++                       // "foo.1.2" which leads to ODS-5 filename foo.1.2;3.
++                       // Do not take into if filename foo.1 in which
++                       // case fit.group(6) is equal to "foo" and this
++                       // fit.group(8) is "1", the ODS-5 filename is
++                       // foo.1;. For []foo...1, the ODS-5 filename is
++                       // foo^..;1 so the version must taken into account.
++                       // For []foo..102, the ODS-5 filename is foo^..102;
++                       // so add in 102 as the file extension.
++                       //
++                       int lastIndexDot = vmstoUnixFilespec.lastIndexOf('.');
++                       String numeric = new String("\\d+");
++
++                       Pattern numericRegex = Pattern.compile(numeric);
++                       Matcher matcher = numericRegex.matcher(fit.group(8));
++                       if (matcher.matches()){
++                           matcher = numericRegex.matcher(
++                                         vmstoUnixFilespec.substring(
++                                              lastIndexDot +1,
++                                              vmstoUnixFilespec.length()));
++                           if (matcher.matches()){
++                               if (!checkVersionNumber(fit.group(8)))
++                                   return null;
++                               break;
++                           }
++                           else if (lastIndexDot != -1 &&
++                                    lastIndexDot !=
++                                    vmstoUnixFilespec.length() - 1){
++                               if (!checkVersionNumber(fit.group(8)))
++                                   return null;
++                               break;
++                           }
++                           else if (lastIndexDot != -1 &&
++                                    lastIndexDot ==
++                                    vmstoUnixFilespec.length() - 1 &&
++                               fit.group(6).charAt(
++                                    fit.group(6).length() -2) != '^'){
++                               if (!checkVersionNumber(fit.group(8)))
++                                   return null;
++                               vmstoUnixFilespec =
++                                             vmstoUnixFilespec.substring(
++                                                    0,
++                                                    vmstoUnixFilespec.length() - 1);
++                               break;
++                           }
++                       }
++                       int lastSemiColon = fit.group(8).lastIndexOf(';');
++                       if (lastSemiColon == - 1 || (lastSemiColon > 0 &&
++                           fit.group(8).charAt(lastSemiColon - 1) == '^'))
++                           lastSemiColon = fit.group(8).length();
++                       else if (lastSemiColon != fit.group(8).length() - 1){
++                           matcher = numericRegex.matcher(
++                                               fit.group(8).substring(
++                                                   lastSemiColon +1,
++                                                   fit.group(8).length()));
++                           if (!matcher.matches())
++                               return null;
++                           if (!checkVersionNumber(
++                                             fit.group(8).substring(
++                                                    lastSemiColon +1,
++                                                    fit.group(8).length())))
++                               return null;
++                       }
++                       StringAndIntRecord record = new StringAndIntRecord(
++                                                   fit.group(8).substring(
++                                                         0,lastSemiColon),0);
++                       record.turnAllCircumflex(false);
++                       String returnedString = record.getVmstoUnixFilespec();
++                       if (returnedString == null)
++                           return null;
++                       if (lastSemiColon > 0)
++                           vmstoUnixFilespec += "." + returnedString;
++                   }
++                   break;
++           } // end switch   
++       }
++       return vmstoUnixFilespec;
++   }
++}
+diff -Naur b/jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java
+--- b/jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java	1970-01-01 01:00:00.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/WindowsFilespecTranslate.java	2012-02-10 15:24:31.000000000 +0100
+@@ -0,0 +1,53 @@
++//
++// File : \B*WindowsFilespecTranslate.java*\B
++//
++//        Copyright (C) 2011 by Philippe.Vouters@laposte.net
++//
++//    This program is free software: you can redistribute it and/or modify
++//    it under the terms of the GNU General Public License as published by the
++//    Free Software Foundation, either version 3 of the License, or
++//    any later version.
++//
++//    This program is distributed in the hope that it will be useful,
++//    but WITHOUT ANY WARRANTY; without even the implied warranty of
++//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++//    GNU General Public License for more details.
++//
++//    You should have received a copy of the GNU General Public License
++//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
++//
++package org.jruby.util;
++
++import java.util.regex.Pattern;
++import java.util.regex.Matcher;
++import java.io.IOException;
++import java.lang.IndexOutOfBoundsException;
++
++public class WindowsFilespecTranslate {
++   public static String windowsFilespecToUnix (String windowsFilespec){
++        String drivename = "^([A-Za-z]:)?";
++        String windowsPath = "(\\\\?[^/\\:\\t\\r\\n]+)+";
++        String UnixFilespec = null;
++
++        Pattern regex =
++              Pattern.compile(drivename +
++                              windowsPath);
++        Matcher fit=regex.matcher(windowsFilespec);
++        if (!fit.matches()){
++            return null;
++        }
++        int MAX_MATCH=6;
++
++        boolean debug = Boolean.valueOf(System.getProperty("debug","false"));
++        if (debug) {
++            try {
++                for (int i=0; i<MAX_MATCH;i++)
++                   System.out.println("fit.group("+i+") = "+fit.group(i));
++            } catch (IndexOutOfBoundsException e) {
++              // do nothing
++            }
++        }
++        UnixFilespec = new String(fit.group(0).replace('\\','/'));
++        return UnixFilespec;
++   }
++}  
