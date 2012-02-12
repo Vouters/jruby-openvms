@@ -1,6 +1,6 @@
-diff -Naur b/jruby-1.6.6/src/org/jruby/RubyDir.java jruby-1.6.6/src/org/jruby/RubyDir.java
---- b/jruby-1.6.6/src/org/jruby/RubyDir.java	2012-01-30 17:57:23.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/RubyDir.java	2012-02-11 12:58:32.000000000 +0100
+diff -Naur ../b/jruby-1.6.6/src/org/jruby/RubyDir.java jruby-1.6.6/src/org/jruby/RubyDir.java
+--- ../b/jruby-1.6.6/src/org/jruby/RubyDir.java	2012-01-30 17:57:23.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/RubyDir.java	2012-02-12 12:23:02.000000000 +0100
 @@ -59,6 +59,7 @@
  import org.jruby.util.Dir;
  import org.jruby.util.JRubyFile;
@@ -41,9 +41,9 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/RubyDir.java jruby-1.6.6/src/org/jruby/Ru
          checkDirIsTwoSlashesOnWindows(runtime, adjustedPath);
          JRubyFile dir = getDir(runtime, adjustedPath, true);
          String realPath = null;
-diff -Naur b/jruby-1.6.6/src/org/jruby/RubyFile.java jruby-1.6.6/src/org/jruby/RubyFile.java
---- b/jruby-1.6.6/src/org/jruby/RubyFile.java	2012-01-30 17:57:23.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/RubyFile.java	2012-02-11 12:58:32.000000000 +0100
+diff -Naur ../b/jruby-1.6.6/src/org/jruby/RubyFile.java jruby-1.6.6/src/org/jruby/RubyFile.java
+--- ../b/jruby-1.6.6/src/org/jruby/RubyFile.java	2012-01-30 17:57:23.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/RubyFile.java	2012-02-12 12:23:02.000000000 +0100
 @@ -76,6 +76,7 @@
  import org.jruby.util.io.ModeFlags;
  import org.jruby.util.JRubyFile;
@@ -146,9 +146,9 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/RubyFile.java jruby-1.6.6/src/org/jruby/R
          return context.getRuntime().newArray(dirname(context, recv, filename),
                  basename(context, recv, new IRubyObject[] { filename }));
      }
-diff -Naur b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java jruby-1.6.6/src/org/jruby/util/GetUnixPath.java
---- b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	1970-01-01 01:00:00.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	2012-02-11 12:59:19.000000000 +0100
+diff -Naur ../b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java jruby-1.6.6/src/org/jruby/util/GetUnixPath.java
+--- ../b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	1970-01-01 01:00:00.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/GetUnixPath.java	2012-02-12 12:23:02.000000000 +0100
 @@ -0,0 +1,15 @@
 +package org.jruby.util;
 +
@@ -165,9 +165,9 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/util/GetUnixPath.java jruby-1.6.6/src/org
 +            return filename;
 +    }
 +}
-diff -Naur b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java jruby-1.6.6/src/org/jruby/util/JRubyFile.java
---- b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-01-30 17:57:24.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-02-11 12:58:32.000000000 +0100
+diff -Naur ../b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java jruby-1.6.6/src/org/jruby/util/JRubyFile.java
+--- ../b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-01-30 17:57:24.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/JRubyFile.java	2012-02-12 12:23:02.000000000 +0100
 @@ -39,6 +39,7 @@
  
  import org.jruby.ext.posix.JavaSecuredFile;
@@ -186,9 +186,9 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/util/JRubyFile.java jruby-1.6.6/src/org/j
      }
  
      public static String normalizeSeps(String path) {
-diff -Naur b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java
---- b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	1970-01-01 01:00:00.000000000 +0100
-+++ jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	2012-02-11 12:58:32.000000000 +0100
+diff -Naur ../b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java
+--- ../b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	1970-01-01 01:00:00.000000000 +0100
++++ jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java	2012-02-12 12:23:02.000000000 +0100
 @@ -0,0 +1,507 @@
 +//
 +// File : \B*DeccTranslateName.java*\B
@@ -697,3 +697,26 @@ diff -Naur b/jruby-1.6.6/src/org/jruby/util/OpenvmsFilespecTranslate.java jruby-
 +       return vmstoUnixFilespec;
 +   }
 +}
+diff -Naur ../b/jruby-1.6.6/test/test_big_decimal.rb jruby-1.6.6/test/test_big_decimal.rb
+--- ../b/jruby-1.6.6/test/test_big_decimal.rb	2012-01-30 17:57:25.000000000 +0100
++++ jruby-1.6.6/test/test_big_decimal.rb	2012-02-12 12:23:13.000000000 +0100
+@@ -3,6 +3,7 @@
+ 
+ class TestBigDecimal < Test::Unit::TestCase
+ 
++  
+   def test_bad_to_s_format_strings
+     bd = BigDecimal.new("1")
+     assert_equal("0.1E1", bd.to_s)
+@@ -234,9 +235,10 @@
+   #JRUBY-3818
+   def test_decimal_format
+     require 'java'
++
+     format = java.text.DecimalFormat.new("#,##0.00")
+     value = java.math.BigDecimal.new("10")
+-    assert_equal "10.00", format.format(value)
++    assert_equal format.format(10.00), format.format(value)
+   end
+ 
+   #JRUBY-5190
