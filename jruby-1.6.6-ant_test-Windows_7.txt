@@ -1,0 +1,290 @@
+test-rake-targets:
+     [echo] Running rake test:rake_targets
+     [echo] compile=OFF, threshold=20, objectspace=false threadpool=false reflec
+tion=false
+     [java] (in C:/Users/pvo/jruby-1.6.6)
+     [java] JAVA options: {:fork=>"true", :failonerror=>"true", :classname=>"org
+.jruby.Main", :maxmemory=>"512M"}
+     [java] NOTE: Gem.source_index is deprecated, use Specification. It will be
+removed on or after 2011-11-01.
+     [java] Gem.source_index called from /C:/Users/pvo/jruby-1.6.6/build/classes
+/jruby/jruby/commands.rb:36.
+     [java] build_lib/rake-0.8.7.gem already installed
+     [java] NOTE: Gem::SourceIndex#search is deprecated with no replacement. It
+will be removed on or after 2011-11-01.
+     [java] Gem::SourceIndex#search called from /C:/Users/pvo/jruby-1.6.6/build/
+classes/jruby/jruby/commands.rb:36.
+     [java] ant compile-test
+     [java] Buildfile: C:\Users\pvo\jruby-1.6.6\build.xml
+     [java]
+     [java] init:
+     [java]
+     [java] prepare-bin-jruby:
+     [java]
+     [java] jar:
+     [java]
+     [java] init:
+     [java]
+     [java] create-dirs:
+     [java]
+     [java] copy-resources:
+     [java]
+     [java] extract-rdocs:
+     [java]
+     [java] update-constants:
+     [java]      [echo] Updating Constants.java
+     [java]      [exec] Result: 1
+     [java]      [echo] ...using git revision = fffffff, tzdata = 2010k
+     [java]      [copy] Copying 1 file to C:\Users\pvo\jruby-1.6.6\src_gen\org\j
+ruby\runtime
+     [java]      [copy] Copying 1 file to C:\Users\pvo\jruby-1.6.6\src_gen\org\j
+ruby\runtime
+     [java]
+     [java] _uc_internal_:
+     [java]
+     [java] prepare:
+     [java]
+     [java] compile-annotation-binder:
+     [java]
+     [java] compile-jruby:
+     [java]       [apt] Since compiler setting isn't classic or modern, ignoring
+ fork setting.
+     [java]       [apt] Since compiler setting isn't classic or modern, ignoring
+ fork setting.
+     [java]
+     [java] emma:
+     [java]
+     [java] instrument:
+     [java]
+     [java] generate-method-classes:
+     [java]
+     [java] _gmc_internal_:
+     [java]
+     [java] generate-unsafe:
+     [java]
+     [java] _gu_internal_:
+     [java]
+     [java] compile:
+     [java]
+     [java] unzip-native-libs:
+     [java]
+     [java] jar-jruby:
+     [java]
+     [java] add-emma-jars:
+     [java]
+     [java] compile-test:
+     [java]     [javac] Compiling 1 source file to C:\Users\pvo\jruby-1.6.6\buil
+d\classes\test
+     [java]
+     [java] BUILD SUCCESSFUL
+     [java] Total time: 7 seconds
+     [java] C:/Users/pvo/jruby-1.6.6/bin/jruby.exe  -IC:/Users/pvo/jruby-1.6.6/l
+ib/ruby/gems/1.8/gems/rake-0.8.7/lib -S rspec --options spec/java_integration/sp
+ec.quiet.opts spec/java_integration/addons/io_spec.rb spec/java_integration/addo
+ns/net_spec.rb spec/java_integration/addons/object_spec.rb spec/java_integration
+/addons/string_spec.rb spec/java_integration/addons/synchronized_class_spec.rb s
+pec/java_integration/addons/throwable_spec.rb spec/java_integration/ant/ant_spec
+.rb spec/java_integration/ant/project_spec.rb spec/java_integration/ant/rake_spe
+c.rb spec/java_integration/ant/target_spec.rb spec/java_integration/ant/task_spe
+c.rb spec/java_integration/exceptions/rescue_spec.rb spec/java_integration/exten
+sions/classpath_spec.rb spec/java_integration/extensions/kernel_spec.rb spec/jav
+a_integration/extensions/list_spec.rb spec/java_integration/fields/field_accesso
+r_spec.rb spec/java_integration/interfaces/constant_spec.rb spec/java_integratio
+n/interfaces/executor_spec.rb spec/java_integration/interfaces/implementation_sp
+ec.rb spec/java_integration/interfaces/iterable_spec.rb spec/java_integration/jr
+ubyc/java/annotation_spec.rb spec/java_integration/jrubyc/java/basic_spec.rb spe
+c/java_integration/jrubyc/java/constructor_spec.rb spec/java_integration/jrubyc/
+java/implements_spec.rb spec/java_integration/jrubyc/java/import_spec.rb spec/ja
+va_integration/jrubyc/java/method_spec.rb spec/java_integration/jrubyc/java/pack
+age_spec.rb spec/java_integration/methods/basics_spec.rb spec/java_integration/m
+ethods/binding_spec.rb spec/java_integration/methods/dir_spec.rb spec/java_integ
+ration/methods/dispatch_spec.rb spec/java_integration/methods/error_spec.rb spec
+/java_integration/methods/java_alias_spec.rb spec/java_integration/methods/java_
+method_spec.rb spec/java_integration/methods/java_send_spec.rb spec/java_integra
+tion/methods/method_selection_spec.rb spec/java_integration/methods/naming_spec.
+rb spec/java_integration/methods/reflecting_spec.rb spec/java_integration/object
+/ivars_spec.rb spec/java_integration/object/marshal_spec.rb spec/java_integratio
+n/object/serialization_spec.rb spec/java_integration/packages/access_spec.rb spe
+c/java_integration/packages/include_spec.rb spec/java_integration/reflection/fie
+ld_spec.rb spec/java_integration/reflection/method_spec.rb spec/java_integration
+/reify/become_java_spec.rb spec/java_integration/rubygems/maven_gemify_spec.rb s
+pec/java_integration/rubygems/rubygems_spec.rb spec/java_integration/types/array
+_spec.rb spec/java_integration/types/coercion_spec.rb spec/java_integration/type
+s/construction_spec.rb spec/java_integration/types/extension_spec.rb spec/java_i
+ntegration/types/inspect_spec.rb spec/java_integration/types/retrieval_spec.rb s
+pec/java_integration/types/wrapping_spec.rb spec/java_integration/utilities/io_s
+pec.rb spec/java_integration/utilities/jar_glob_spec.rb spec/java_integration/ut
+ilities/jdbc_unloader_spec.rb spec/java_integration/utilities/jruby_spec.rb spec
+/java_integration/utilities/load_from_jar_spec.rb
+     [java] You must use ANSICON 1.31 or later (http://adoxa.110mb.com/ansicon/)
+ to use colour on Windows
+     [java] ....................................................................
+................................................................................
+.................................*.*.*.............................*............
+............................*...................................................
+................................................................................
+.............*..................................................................
+...........................................................*..*.................
+.............Couldn't delete glob_test/glob-test.jar - Windows bug with JarFile
+holding write-lock after closed
+     [java] ..Couldn't delete 'spaces test/test.jar' - Windows bug with JarFile
+holding write-lock after closed
+     [java] ..F.......
+     [java]
+     [java] Pending:
+     [java]   A class with varargs constructors should be called with the most e
+xact overload
+     [java]     # needs better type-driven ranking of overloads
+     [java]     # ./spec/java_integration/methods/dispatch_spec.rb:122
+     [java]   A class with varargs instance methods should be called with the mo
+st exact overload
+     [java]     # needs better type-driven ranking of overloads
+     [java]     # ./spec/java_integration/methods/dispatch_spec.rb:183
+     [java]   A class with varargs static methods should be called with the most
+ exact overload
+     [java]     # needs better type-driven ranking of overloads
+     [java]     # ./spec/java_integration/methods/dispatch_spec.rb:227
+     [java]   Java static method names should not overwrite critical core Ruby m
+ethods
+     [java]     # need a better way to separate class and instance methods in th
+e java code
+     [java]     # ./spec/java_integration/methods/naming_spec.rb:63
+     [java]   A Java package can be imported using 'include_package package.modu
+le
+     [java]     # does not work; probably should for consistency?
+     [java]     # ./spec/java_integration/packages/access_spec.rb:22
+     [java]   Java String and primitive-typed methods should select the most nar
+row and precise overloaded method
+     [java]     # selection based on precision is not supported yet
+     [java]     # ./spec/java_integration/types/coercion_spec.rb:131
+     [java]   A Ruby subclass of a Java concrete class can not invoke package-vi
+sible methods of the superclass
+     [java]     # Why doesn't this raise NoMethodError?
+     [java]     # ./spec/java_integration/types/extension_spec.rb:39
+     [java]   A Ruby subclass of a Java concrete class can not invoke private me
+thods of the superclass
+     [java]     # Why doesn't this raise NoMethodError?
+     [java]     # ./spec/java_integration/types/extension_spec.rb:72
+     [java]
+     [java] Failures:
+     [java]
+     [java]   1) Dir.glob and Dir[] with multiple magic modifiers iterates over
+directories when there are more than one magic modifier
+     [java]      Failure/Error: Dir.glob("file:#{File.expand_path(Dir.pwd)}/top.
+jar!top/dir2/**/*/**").size.should == 6
+     [java]        expected: 6
+     [java]             got: 0 (using ==)
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-expectations-2.4.0/lib/rspec/e
+xpectations/fail_with.rb:29:in `fail_with'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-expectations-2.4.0/lib/rspec/m
+atchers/operator_matcher.rb:48:in `fail_with_message'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-expectations-2.4.0/lib/rspec/m
+atchers/operator_matcher.rb:70:in `__delegate_operator'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-expectations-2.4.0/lib/rspec/m
+atchers/operator_matcher.rb:60:in `eval_match'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-expectations-2.4.0/lib/rspec/m
+atchers/operator_matcher.rb:29:in `=='
+     [java]      # org/jruby/RubyProc.java:270:in `call'
+     [java]      # ./spec/java_integration/utilities/jar_glob_spec.rb:166:in `(r
+oot)'
+     [java]      # org/jruby/RubyDir.java:472:in `chdir'
+     [java]      # ./lib/ruby/1.8/fileutils.rb:121:in `cd'
+     [java]      # ./spec/java_integration/utilities/jar_glob_spec.rb:165:in `(r
+oot)'
+     [java]      # org/jruby/RubyKernel.java:2043:in `instance_eval'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:49:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:47:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:98:in `with_around_hooks'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:46:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:91:in `with_pending_capture'
+     [java]      # org/jruby/RubyKernel.java:1181:in `catch'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:90:in `with_pending_capture'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:45:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple.rb:43:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple_group.rb:261:in `run_examples'
+     [java]      # org/jruby/RubyArray.java:2324:in `collect'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple_group.rb:257:in `run_examples'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple_group.rb:231:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/exam
+ple_group.rb:229:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/comm
+and_line.rb:27:in `run'
+     [java]      # org/jruby/RubyArray.java:2324:in `collect'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/comm
+and_line.rb:27:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/repo
+rter.rb:12:in `report'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/comm
+and_line.rb:24:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/runn
+er.rb:55:in `run_in_process'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/runn
+er.rb:46:in `run'
+     [java]      # ./lib/ruby/gems/1.8/gems/rspec-core-2.4.0/lib/rspec/core/runn
+er.rb:10:in `autorun'
+     [java]      # org/jruby/RubyProc.java:270:in `call'
+     [java]      # org/jruby/RubyProc.java:224:in `call'
+     [java]
+     [java] Finished in 9.3 seconds
+     [java] 573 examples, 1 failure, 8 pending
+     [java] rake aborted!
+     [java] ruby  -IC:/Users/pvo/jruby-1.6.6/lib/ruby/gems/1.8/gems/rake-0.8.7/l
+ib -S rspec --options spec/java_integration/spec.quiet.opts spec/java_integratio
+n/addons/io_spec.rb spec/java_integration/addons/net_spec.rb spec/java_integrati
+on/addons/object_spec.rb spec/java_integration/addons/string_spec.rb spec/java_i
+ntegration/addons/synchronized_class_spec.rb spec/java_integration/addons/throwa
+ble_spec.rb spec/java_integration/ant/ant_spec.rb spec/java_integration/ant/proj
+ect_spec.rb spec/java_integration/ant/rake_spec.rb spec/java_integration/ant/tar
+get_spec.rb spec/java_integration/ant/task_spec.rb spec/java_integration/excepti
+ons/rescue_spec.rb spec/java_integration/extensions/classpath_spec.rb spec/java_
+integration/extensions/kernel_spec.rb spec/java_integration/extensions/list_spec
+.rb spec/java_integration/fields/field_accessor_spec.rb spec/java_integration/in
+terfaces/constant_spec.rb spec/java_integration/interfaces/executor_spec.rb spec
+/java_integration/interfaces/implementation_spec.rb spec/java_integration/interf
+aces/iterable_spec.rb spec/java_integration/jrubyc/java/annotation_spec.rb spec/
+java_integration/jrubyc/java/basic_spec.rb spec/java_integration/jrubyc/java/con
+structor_spec.rb spec/java_integration/jrubyc/java/implements_spec.rb spec/java_
+integration/jrubyc/java/import_spec.rb spec/java_integration/jrubyc/java/method_
+spec.rb spec/java_integration/jrubyc/java/package_spec.rb spec/java_integration/
+methods/basics_spec.rb spec/java_integration/methods/binding_spec.rb spec/java_i
+ntegration/methods/dir_spec.rb spec/java_integration/methods/dispatch_spec.rb sp
+ec/java_integration/methods/error_spec.rb spec/java_integration/methods/java_ali
+as_spec.rb spec/java_integration/methods/java_method_spec.rb spec/java_integrati
+on/methods/java_send_spec.rb spec/java_integration/methods/method_selection_spec
+.rb spec/java_integration/methods/naming_spec.rb spec/java_integration/methods/r
+eflecting_spec.rb spec/java_integration/object/ivars_spec.rb spec/java_integrati
+on/object/marshal_spec.rb spec/java_integration/object/serialization_spec.rb spe
+c/java_integration/packages/access_spec.rb spec/java_integration/packages/includ
+e_spec.rb spec/java_integration/reflection/field_spec.rb spec/java_integration/r
+eflection/method_spec.rb spec/java_integration/reify/become_java_spec.rb spec/ja
+va_integration/rubygems/maven_gemify_spec.rb spec/java_integration/rubygems/ruby
+gems_spec.rb spec/java_integration/types/array_spec.rb spec/java_integration/typ
+es/coercion_spec.rb spec/java_integration/types/construction_spec.rb spec/java_i
+ntegration/types/extension_spec.rb spec/java_integration/types/inspect_spec.rb s
+pec/java_integration/types/retrieval_spec.rb spec/java_integration/types/wrappin
+g_spec.rb spec/java_integration/utilities/io_spec.rb spec/java_integration/utili
+ties/jar_glob_spec.rb spec/java_integration/utilities/jdbc_unloader_spec.rb spec
+/java_integration/utilities/jruby_spec.rb spec/java_integration/utilities/load_f
+rom_jar_spec.rb failed
+     [java]
+     [java] (See full trace by running task with --trace)
+
+BUILD FAILED
+C:\Users\pvo\jruby-1.6.6\build.xml:1148: The following error occurred while exec
+uting this line:
+C:\Users\pvo\jruby-1.6.6\build.xml:1167: Java returned: 1
+
+Total time: 6 minutes 8 seconds
+
+C:\Users\pvo\jruby-1.6.6>
